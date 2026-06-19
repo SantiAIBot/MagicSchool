@@ -28,7 +28,7 @@ function initMemoryGame() {
   let cols = 3;
   if (memoryDifficulty > 6) cols = 4;
   if (memoryDifficulty > 12) cols = 5;
-  grid.style.gridTemplateColumns = `repeat(${cols}, 80px)`;
+  grid.style.gridTemplateColumns = `repeat(${cols}, auto)`;
 
   // Seleccionar iconos aleatorios para las parejas
   const numPairs = memoryDifficulty / 2;

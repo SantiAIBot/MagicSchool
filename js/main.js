@@ -170,34 +170,52 @@ function showUnicornFeedback(type, isCorrect) {
   }, 3000);
 }
 
-// ---------- MATEMÁTICAS ----------
+// ---------- MATEMÁTICAS (Problemas de Razonamiento) ----------
 
 /**
- * Genera un set de 10 preguntas aleatorias del banco de 20
+ * Genera un set de 10 problemas de razonamiento
  */
 function generarPreguntas() {
   preguntas = [];
   preguntaActual = 0;
 
   const generadores = [
-    () => genSuma(1, 9), () => genSuma(1, 9), () => genResta(5, 15, 1, 5),
-    () => genSuma(1, 9), () => genResta(5, 15, 1, 5), () => genSuma(10, 30, 5, 20),
-    () => genResta(15, 40, 5, 15), () => genComparacion(10, 50), () => genSecuenciaPar(),
-    () => genSumaTriple(), () => genHistoria(), () => genResta(30, 60, 10, 25),
-    () => genComparacionMenor(20, 80), () => genSuma(10, 30, 5, 20), () => genResta(15, 40, 5, 15),
-    () => genSecuenciaPar(), () => genSumaTriple(), () => genHistoria(),
-    () => genSuma(10, 30, 5, 20), () => genResta(30, 60, 10, 25)
+    () => genHistoriaSuma(), () => genHistoriaResta(), () => genHistoriaSuma(),
+    () => genHistoriaResta(), () => genHistoriaSuma(), () => genHistoriaResta(),
+    () => genHistoriaSuma(), () => genHistoriaResta(), () => genHistoriaSuma(),
+    () => genHistoriaResta()
   ];
 
-  // Mezclar el banco de generadores para aleatoriedad
   const mezclados = [...generadores].sort(() => Math.random() - 0.5);
 
-  // Seleccionar solo las primeras 10 preguntas
   for (let i = 0; i < 10; i++) {
     preguntas.push(mezclados[i]());
   }
 
   mostrarPregunta();
+}
+
+/**
+ * Generadores de problemas de razonamiento
+ */
+function genHistoriaSuma() {
+  const items = ["manzanas", "caramelos", "juguetes", "flores", "estrellas"];
+  const item = items[rand(0, items.length - 1)];
+  const a = rand(1, 10), b = rand(1, 10);
+  return { 
+    texto: `Si ${userName} tiene ${a} ${item} y su mamá le regala ${b} más, ¿cuántas ${item} tiene en total?`, 
+    resp: a + b 
+  };
+}
+
+function genHistoriaResta() {
+  const items = ["galletas", "globos", "lápices", "frutas", "monedas"];
+  const item = items[rand(0, items.length - 1)];
+  const a = rand(10, 20), b = rand(1, 9);
+  return { 
+    texto: `Si ${userName} tiene ${a} ${item} y se le pierden ${b}, ¿cuántas ${item} le quedan ahora?`, 
+    resp: a - b 
+  };
 }
 
 /**
@@ -251,59 +269,28 @@ function verificarRespuesta() {
     fb.style.color = "red";
     // Si la función showUnicornFeedback existe, la llamamos para dar ánimo
     if (typeof showUnicornFeedback === 'function') {
-       const type = fb.id.includes('math') ? 'math' : 'numbers';
-       showUnicornFeedback(type, false);
+       showUnicornFeedback('math', false);
     }
   }
 }
 
-// Generadores de ejercicios matemáticos
-function genSuma(a1, a2, b1 = a1, b2 = a2) {
-  const a = rand(a1, a2), b = rand(b1, b2);
-  return { texto: `¿Cuánto es ${a} + ${b}?`, resp: a + b };
-}
-function genResta(a1, a2, b1, b2) {
-  const a = rand(a1, a2), b = rand(b1, b2);
-  return { texto: `¿Cuánto es ${a} - ${b}?`, resp: a - b };
-}
-function genComparacion(min, max) {
-  const a = rand(min, max), b = rand(min, max);
-  return { texto: `¿Qué número es mayor: ${a} o ${b}?`, resp: Math.max(a, b) };
-}
-function genComparacionMenor(min, max) {
-  const a = rand(min, max), b = rand(min, max);
-  return { texto: `¿Qué número es menor: ${a} o ${b}?`, resp: Math.min(a, b) };
-}
-function genSecuenciaPar() {
-  const start = rand(2, 10);
-  return { texto: `Secuencia: ${start}, ${start+2}, ${start+4}, ${start+6}, ___`, resp: start + 8 };
-}
-function genSumaTriple() {
-  const a = rand(1, 10), b = rand(1, 10), c = rand(1, 10);
-  return { texto: `¿Cuánto es ${a} + ${b} + ${c}?`, resp: a + b + c };
-}
-function genHistoria() {
-  const a = rand(5, 15), b = rand(3, 10), c = rand(1, 5);
-  return { texto: `Pintas ${a} flores, luego ${b} más, pero borras ${c}. ¿Quedan?`, resp: a + b - c };
-}
-
-// ---------- NÚMEROS ----------
+// ---------- NÚMEROS (Aritmética Simple) ----------
 
 /**
- * Genera 10 ejercicios rápidos de números
+ * Genera 10 ejercicios rápidos de números (Aritmética simple)
  */
 function generarNumeros() {
   numerosPreguntas = [];
   numeroActual = 0;
   for (let i = 0; i < 10; i++) {
-    const a = rand(1, 20), b = rand(1, 20);
+    const a = rand(1, 10), b = rand(1, 10);
     const tipo = Math.random() < 0.5 ? 'suma' : 'resta';
     let texto, resp;
     if (tipo === 'suma') {
-      texto = `¿Cuánto es ${a} + ${b}?`; resp = a + b;
+      texto = `${a} + ${b} = ?`; resp = a + b;
     } else {
       const max = Math.max(a, b), min = Math.min(a, b);
-      texto = `¿Cuánto es ${max} - ${min}?`; resp = max - min;
+      texto = `${max} - ${min} = ?`; resp = max - min;
     }
     numerosPreguntas.push({ texto, resp });
   }

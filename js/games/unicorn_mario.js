@@ -32,8 +32,13 @@ rainbowImg.src = "C:/Users/User/Pictures/Unicorn walking cartoon colored clipart
 function startUnicornGame() {
   unicornCanvas = document.getElementById('unicorn-game');
   ctx = unicornCanvas.getContext('2d');
+
+  // Ajustar tamaño del canvas dinámicamente según la pantalla
+  const containerWidth = unicornCanvas.parentElement.clientWidth;
+  unicornCanvas.width = Math.min(containerWidth, 800);
+  unicornCanvas.height = unicornCanvas.width / 2; // Mantener ratio 2:1
   
-  unicornY = 300;
+  unicornY = unicornCanvas.height - 100;
   unicornVY = 0;
   obstacles = [];
   coins = [];
@@ -64,7 +69,8 @@ function startUnicornGame() {
  */
 function unicornJump() {
   if (!isJumping && gameActive) {
-    unicornVY = -18;
+    // Escalar salto según altura del canvas
+    unicornVY = -(unicornCanvas.height * 0.045); 
     isJumping = true;
     if (typeof playSound === 'function') playSound("unicornJump");
   }
@@ -78,11 +84,12 @@ function gameUpdate() {
 
   drawBackground();
 
+  const groundY = unicornCanvas.height - 100;
   unicornVY += gravity;
   unicornY += unicornVY;
 
-  if (unicornY > 300) {
-    unicornY = 300;
+  if (unicornY > groundY) {
+    unicornY = groundY;
     unicornVY = 0;
     isJumping = false;
   }
@@ -116,7 +123,7 @@ function gameUpdate() {
     if (checkCollision(unicornX + 25, unicornY + 25, 50, 50, c.x - 15, c.y - 15, 30, 30)) {
       score++;
       coins.splice(i, 1);
-      showSpeech("¡Bien hecho, Helena!");
+      showSpeech(`¡Bien hecho, ${userName}!`);
       if (typeof playSound === 'function') playSound("unicornCoin");
     }
 
@@ -134,7 +141,7 @@ function gameUpdate() {
   }
 
   ctx.fillStyle = "#333";
-  ctx.font = "bold 24px Comic Sans MS";
+  ctx.font = "bold 20px Comic Sans MS";
   ctx.fillText("Monedas: " + score, 20, 40);
 }
 
@@ -145,25 +152,25 @@ function drawBackground() {
   ctx.fillStyle = "#a0eaff";
   ctx.fillRect(0, 0, unicornCanvas.width, unicornCanvas.height);
 
+  const horizon = unicornCanvas.height * 0.9;
+
   if (rainbowImg.complete && rainbowImg.naturalWidth !== 0) {
-    ctx.drawImage(rainbowImg, 0, 0, unicornCanvas.width, 360);
+    ctx.drawImage(rainbowImg, 0, 0, unicornCanvas.width, horizon);
   } else {
     const colors = ["#ff0000", "#ff7f00", "#ffff00", "#00ff00", "#0000ff", "#4b0082", "#8b00ff"];
     ctx.globalAlpha = 0.6;
     for (let i = 0; i < colors.length; i++) {
       ctx.strokeStyle = colors[i];
-      ctx.lineWidth = 15;
+      ctx.lineWidth = unicornCanvas.height * 0.03;
       ctx.beginPath();
-      ctx.arc(400, 450, 420 - (i * 15), Math.PI, 0);
+      ctx.arc(unicornCanvas.width / 2, unicornCanvas.height * 1.1, (unicornCanvas.height * 1.05) - (i * 15), Math.PI, 0);
       ctx.stroke();
     }
     ctx.globalAlpha = 1.0;
   }
 
   ctx.fillStyle = "#7cfc00";
-  ctx.fillRect(0, 360, unicornCanvas.width, 40);
-  ctx.fillStyle = "#228b22";
-  ctx.fillRect(0, 390, unicornCanvas.width, 10);
+  ctx.fillRect(0, horizon, unicornCanvas.width, unicornCanvas.height - horizon);
 }
 
 /**
@@ -177,9 +184,10 @@ function drawUnicorn(x, y) {
  * Obstáculos
  */
 function spawnObstacle() {
+  const groundY = unicornCanvas.height - 100;
   obstacles.push({
     x: unicornCanvas.width,
-    y: 150,
+    y: groundY + 70,
     w: 20,
     h: 30
   });
@@ -189,9 +197,10 @@ function spawnObstacle() {
  * Monedas
  */
 function spawnCoin() {
+  const groundY = unicornCanvas.height - 100;
   coins.push({
     x: unicornCanvas.width,
-    y: Math.random() * 150 + 100
+    y: Math.random() * (groundY - 100) + 100
   });
 }
 
@@ -216,13 +225,13 @@ function drawSpeechBubble(x, y, text) {
   ctx.lineWidth = 2;
 
   ctx.beginPath();
-  ctx.roundRect(x, y, 140, 30, 10);
+  ctx.roundRect(x, y, 160, 35, 10);
   ctx.fill();
   ctx.stroke();
 
   ctx.fillStyle = "black";
-  ctx.font = "12px Arial";
-  ctx.fillText(text, x + 10, y + 20);
+  ctx.font = "bold 14px Arial";
+  ctx.fillText(text, x + 10, y + 22);
 }
 
 /**
@@ -233,5 +242,5 @@ function gameOver() {
   clearInterval(gameLoopId);
   if (typeof playSound === 'function') playSound("unicornHit");
   if (typeof sounds !== 'undefined' && sounds.unicornMusic) sounds.unicornMusic.pause();
-  alert("¡Ups, Helena! Monedas: " + score);
+  alert(`¡Ups, ${userName}! Monedas: ${score}`);
 }

@@ -134,7 +134,7 @@ function renderCheckers() {
   }
 
   document.getElementById('checkers-status').textContent = 
-    checkersTurn === 'user' ? 'Tu turno, Helena 🦄' : 'Turno del dragón 🐲 (Pensando...)';
+    checkersTurn === 'user' ? `Tu turno, ${userName} 🦄` : 'Turno del dragón 🐲 (Pensando...)';
 }
 
 /**
@@ -261,7 +261,7 @@ function cpuCheckersMove() {
     selectedSquare = chosenMove.from;
     movePiece(chosenMove);
   } else {
-    alert("¡Felicidades Helena! Has ganado a los dragones.");
+    alert(`¡Felicidades ${userName}! Has ganado a los dragones.`);
     initCheckers();
   }
 }

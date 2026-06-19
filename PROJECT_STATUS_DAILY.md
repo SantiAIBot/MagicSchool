@@ -25,6 +25,10 @@ Refactor the "Plataforma Mágica" into a modular structure and add a centralized
 - [x] Unicorn Checkers (Full rules: Captures, Kings, Long-range movement).
 - [x] Reading animation: First to last letter sequence.
 - [x] Dynamic greeting implementation: Ask for name and update all greetings.
+- [x] Responsive giant numbers: Adjusted font sizes for iPad/Tablet screens using clamp().
+- [x] Logic separation: "Números" (Simple arithmetic) vs "Matemáticas" (Reasoning word problems).
+- [x] Responsive Games: Memory, Tic-Tac-Toe, Mario, and Checkers now scale with screen size.
+- [x] Memory Game update: Matched cards now stay face up.
 
 ## Today's Tasks
 1. ✅ Create directory structure for code and sounds.
@@ -40,7 +44,8 @@ Refactor the "Plataforma Mágica" into a modular structure and add a centralized
 11. ✅ Implement theme-aware Unicorn Checkers game with advanced rules.
 12. ✅ Fix Reading animation to follow letter-by-letter sequence.
 13. ✅ Implement dynamic name greeting (Change "Helena" to user input).
-14. ✅ Annotate all code line by line.
+14. ✅ Refine Math/Numbers logic and improve cross-device responsiveness for all games.
+15. ✅ Annotate all code line by line.
 
 ## Expected Audio Files (sounds/ folder)
 - `sounds/ui/click.mp3`
