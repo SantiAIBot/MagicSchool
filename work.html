@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Plataforma Mágica</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: "Comic Sans MS", cursive, sans-serif;
+      color: #333;
+      transition: background 0.5s ease;
+    }
+
+    /* Temas */
+    body.tema-bluey {
+      background: linear-gradient(135deg, #87cefa, #e0ffff);
+    }
+    body.tema-unicornio {
+      background: linear-gradient(135deg, #ffb3ff, #ffe6ff);
+    }
+    body.tema-arte {
+      background: linear-gradient(135deg, #ffd27f, #fff0b3);
+    }
+    body.tema-mixto {
+      background: linear-gradient(135deg, #ffb3ff, #87cefa);
+    }
+
+    .top-bar {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px;
+      background: rgba(255,255,255,0.8);
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+
+    .tema-selector, .tabs {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      border: none;
+      padding: 8px 12px;
+      border-radius: 18px;
+      cursor: pointer;
+      font-weight: bold;
+      background-color: #fff;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+
+    button:hover {
+      transform: scale(1.03);
+    }
+
+    .tabs button {
+      background-color: #ff80c0;
+      color: #fff;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 15px;
+    }
+
+    .tab-content {
+      display: none;
+      margin-top: 15px;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .card {
+      background-color: rgba(255,255,255,0.9);
+      border-radius: 20px;
+      padding: 15px;
+      margin-bottom: 15px;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+    }
+
+    .card h2 {
+      margin-top: 0;
+    }
+
+    input[type="number"], input[type="text"] {
+      padding: 6px;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+      font-size: 1rem;
+      width: 80px;
+    }
+
+    .resultado {
+      margin-top: 5px;
+      font-weight: bold;
+    }
+
+    .status-bar {
+      margin-top: 10px;
+      font-size: 0.95rem;
+    }
+
+    /* Lectura */
+    .reading-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+      margin-bottom: 20px;
+    }
+
+    #reading-word {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      font-size: 4rem;
+      font-weight: bold;
+      letter-spacing: normal;
+    }
+
+    #reading-arrow {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      height: 4rem;
+      width: 100%;
+    }
+
+    .reading-letter, .reading-finger {
+      width: 60px;
+      text-align: center;
+    }
+
+    .reading-finger {
+      font-size: 3rem;
+      visibility: hidden;
+    }
+
+    .reading-finger.active {
+      visibility: visible;
+    }
+
+    /* Juegos */
+    .game-info {
+      margin-bottom: 10px;
+    }
+
+    .tictactoe {
+      display: grid;
+      grid-template-columns: repeat(3, 70px);
+      grid-template-rows: repeat(3, 70px);
+      gap: 5px;
+      justify-content: center;
+      margin-top: 10px;
+    }
+
+    .tictactoe button {
+      width: 70px;
+      height: 70px;
+      font-size: 2rem;
+      background-color: #fff;
+    }
+
+    @media (max-width: 600px) {
+      .tictactoe {
+        grid-template-columns: repeat(3, 60px);
+        grid-template-rows: repeat(3, 60px);
+      }
+      .tictactoe button {
+        width: 60px;
+        height: 60px;
+      }
+    }
+
+    /* Saludo Helena */
+    #welcome-screen {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: linear-gradient(135deg, #ffb3ff, #87cefa);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 2000;
+      text-align: center;
+    }
+
+    #helena-overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(255, 182, 193, 0.9);
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .helena-text {
+      font-size: 4rem;
+      color: white;
+      text-shadow: 3px 3px 0 #ff69b4;
+      animation: bounce 1s infinite;
+    }
+
+    /* Ayudante Unicornio en Actividades */
+    .unicorn-helper {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      margin-top: 15px;
+      padding: 10px;
+      background: white;
+      border-radius: 50px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      border: 2px solid #ffb3ff;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .unicorn-helper.visible {
+      opacity: 1;
+    }
+
+    .unicorn-bubble {
+      background: #fff0f5;
+      padding: 10px 15px;
+      border-radius: 20px;
+      position: relative;
+      font-weight: bold;
+      color: #d02090;
+    }
+
+    .unicorn-bubble::after {
+      content: '';
+      position: absolute;
+      left: -10px;
+      top: 50%;
+      border: 10px solid transparent;
+      border-right-color: #fff0f5;
+      margin-top: -10px;
+    }
+
+    /* Estilos para Actividades Gigantes */
+    .pregunta-gigante {
+      font-size: 10rem;
+      font-weight: bold;
+      text-align: center;
+      margin: 20px 0;
+      color: #ff69b4;
+      text-shadow: 4px 4px #fff;
+    }
+
+    input.input-gigante {
+      font-size: 6rem;
+      width: 300px !important;
+      text-align: center;
+      border: 8px solid #ffb3ff;
+      border-radius: 30px;
+      padding: 20px;
+      background: white;
+    }
+
+    button.btn-gigante {
+      font-size: 3.5rem;
+      padding: 25px 60px;
+      margin-top: 30px;
+      background: #ff69b4;
+      color: white;
+      border-radius: 80px;
+      box-shadow: 0 8px 15px rgba(0,0,0,0.2);
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-20px); }
+    }
+  </style>
+</head>
+<body class="tema-unicornio">
+  <!-- Pantalla de Bienvenida Inicial -->
+  <div id="welcome-screen">
+    <div style="font-size: 5rem; animation: bounce 1s infinite;">🦄</div>
+    <h1 id="welcome-title" style="font-size: 4rem; color: white; text-shadow: 2px 2px #ff69b4;">¡Hola! ¿Cómo te llamas?</h1>
+    <input type="text" id="user-name-input" placeholder="Tu nombre aquí" style="font-size: 2rem; padding: 10px; border-radius: 20px; border: 4px solid #ff69b4; margin-bottom: 20px; text-align: center;">
+    <button onclick="startApp()" style="font-size: 2rem; padding: 20px 40px; background: white; color: #ff69b4; border-radius: 50px;">Empezar a aprender ✨</button>
+  </div>
+
+  <!-- Overlay de Saludo (para juegos) -->
+  <div id="helena-overlay" onclick="closeGreeting()">
+    <div class="helena-text">¡Hola <span class="user-name">Helena</span>! 🦄✨</div>
+    <p style="color: white; font-size: 1.5rem;">Haz clic para jugar</p>
+  </div>
+
+  <div class="top-bar">
+    <div class="tema-selector">
+      <span>🎨 Tema:</span>
+      <button onclick="cambiarTema('tema-bluey')">Bluey 🐶</button>
+      <button onclick="cambiarTema('tema-unicornio')">Unicornio 🦄</button>
+      <button onclick="cambiarTema('tema-arte')">Arte y música 🎵</button>
+      <button onclick="cambiarTema('tema-mixto')">Mezcla ✨</button>
+    </div>
+    <div class="tabs">
+      <button onclick="openTab('tasks-menu')">📝 Tareas</button>
+      <button onclick="openGamesTab()">🎮 Juegos</button>
+      <div style="margin-left: 20px; font-weight: bold; font-size: 1.2rem; color: #ff69b4;">⭐ Puntos: <span id="puntos-totales">0</span></div>
+    </div>
+  </div>
+
+  <div class="container">
+    <!-- MENÚ DE TAREAS -->
+    <div id="tab-tasks-menu" class="tab-content active">
+      <div class="card" style="text-align: center;">
+        <h2>📝 Tus Tareas, <span class="user-name">Helena</span></h2>
+        <div style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; margin-top: 20px;">
+          <div class="card" style="width: 180px; cursor: pointer; background: #e0f7fa;" onclick="openTab('math')">
+            <div style="font-size: 3rem;">📘</div>
+            <h4>Matemáticas</h4>
+          </div>
+          <div class="card" style="width: 180px; cursor: pointer; background: #fff9c4;" onclick="openTab('numbers')">
+            <div style="font-size: 3rem;">🔢</div>
+            <h4>Números</h4>
+          </div>
+          <div class="card" style="width: 180px; cursor: pointer; background: #fce4ec;" onclick="openTab('reading')">
+            <div style="font-size: 3rem;">📖</div>
+            <h4>Lectura</h4>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB MATEMÁTICAS -->
+    <div id="tab-math" class="tab-content">
+      <button onclick="openTab('tasks-menu')" style="background: #ccc; margin-bottom: 10px;">⬅ Volver a Tareas</button>
+      <div class="card">
+        <h2>Matemáticas mágicas (10 preguntas)</h2>
+        <p>Responde las 10 preguntas. Si las aciertas todas, se generan nuevas versiones y ganas <b>15 minutos</b> de juego. 🎁</p>
+        <div id="math-questions"></div>
+        <div id="math-status" class="status-bar"></div>
+        <!-- Ayudante Unicornio para Matemáticas -->
+        <div id="math-unicorn" class="unicorn-helper">
+          <div style="font-size: 2.5rem;">🦄</div>
+          <div class="unicorn-bubble" id="math-bubble">¡Hola <span class="user-name">Helena</span>! Vamos a practicar.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB NÚMEROS -->
+    <div id="tab-numbers" class="tab-content">
+      <button onclick="openTab('tasks-menu')" style="background: #ccc; margin-bottom: 10px;">⬅ Volver a Tareas</button>
+      <div class="card">
+        <h2>Práctica de números 🔢</h2>
+        <p>Ejercicios rápidos solo de números.</p>
+        <div id="numbers-questions"></div>
+        <div id="numbers-status" class="status-bar"></div>
+        <!-- Ayudante Unicornio para Números -->
+        <div id="numbers-unicorn" class="unicorn-helper">
+          <div style="font-size: 2.5rem;">🦄</div>
+          <div class="unicorn-bubble" id="numbers-bubble">¡Tú puedes, <span class="user-name">Helena</span>!</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB LECTURA -->
+    <div id="tab-reading" class="tab-content">
+      <button onclick="openTab('tasks-menu')" style="background: #ccc; margin-bottom: 10px;">⬅ Volver a Tareas</button>
+      <div class="card">
+        <h2>Aprender a leer 📖</h2>
+        <p>El dedo se mueve letra por letra para que Helena pueda seguir la lectura.</p>
+        
+        <div class="reading-container">
+          <div id="reading-word"></div>
+          <div id="reading-arrow"></div>
+        </div>
+
+        <button onclick="playReading()" class="btn-gigante">▶ Leer palabra</button>
+        <button onclick="nextReadingWord()" class="btn-gigante" style="background: #87cefa;">Siguiente palabra</button>
+      </div>
+    </div>
+
+    <!-- TAB JUEGOS -->
+    <div id="tab-games" class="tab-content">
+      <div class="card">
+        <h2>Zona de juegos 🎮</h2>
+        <div class="game-info">
+          <div>Minutos de juego disponibles: <span id="play-minutes">0</span></div>
+          <div id="timer-display"></div>
+        </div>
+        <button onclick="startGameSession()">Empezar sesión de juego</button>
+        <div id="games-locked-msg" class="status-bar"></div>
+
+        <!-- Menú de Selección de Juegos -->
+        <div id="game-selection" style="display:none; text-align: center; margin-top: 20px;">
+          <h3>Selecciona un juego, <span class="user-name">Helena</span> 🦄</h3>
+          <div style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;">
+            <div class="card" style="width: 200px; cursor: pointer;" onclick="showGame('tictactoe')">
+              <div style="font-size: 3rem;">❌⭕</div>
+              <h4>Tic‑Tac‑Toe</h4>
+            </div>
+            <div class="card" style="width: 200px; cursor: pointer;" onclick="showGame('unicorn')">
+              <div style="font-size: 3rem;">🦄🌈</div>
+              <h4>Unicorn‑Mario</h4>
+            </div>
+            <div class="card" style="width: 200px; cursor: pointer;" onclick="showGame('memory')">
+              <div style="font-size: 3rem;">🧠</div>
+              <h4>Memoria</h4>
+            </div>
+            <div class="card" style="width: 200px; cursor: pointer;" onclick="showGame('checkers')">
+              <div style="font-size: 3rem;">🏁</div>
+              <h4>Damas</h4>
+            </div>
+          </div>
+        </div>
+
+        <!-- Contenedores Individuales de Juegos -->
+        <div id="container-tictactoe" class="game-container" style="display:none;">
+          <button onclick="backToGamesMenu()" style="background: #ccc; margin-bottom: 10px;">⬅ Volver al menú</button>
+          <h3>Tic‑Tac‑Toe (❤️ y O)</h3>
+          <div id="ttt-status"></div>
+          <div class="tictactoe" id="ttt-board"></div>
+          <button onclick="resetTicTacToe()">Reiniciar juego</button>
+        </div>
+
+        <div id="container-unicorn" class="game-container" style="display:none;">
+          <button onclick="backToGamesMenu()" style="background: #ccc; margin-bottom: 10px;">⬅ Volver al menú</button>
+          <h3>Unicorn‑Mario 🦄🌈</h3>
+          <div style="text-align: center;">
+            <canvas id="unicorn-game" width="800" height="400" style="background:#a0eaff; border-radius:20px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); border: 4px solid #fff; max-width: 100%;"></canvas>
+            <br>
+            <button onclick="startUnicornGame()" style="padding: 15px 30px; font-size: 1.5rem; margin-top: 15px; background: #ffb3ff;">¡Jugar ahora, Helena! 🦄</button>
+          </div>
+        </div>
+
+        <div id="container-memory" class="game-container" style="display:none;">
+          <button onclick="backToGamesMenu()" style="background: #ccc; margin-bottom: 10px;">⬅ Volver al menú</button>
+          <h3>Juego de Memoria 🧠</h3>
+          <div id="memory-status" style="font-weight: bold; color: #ff69b4; margin-bottom: 10px;"></div>
+          <div id="memory-grid" style="display: grid; gap: 15px; justify-content: center; margin-top: 20px; perspective: 1000px;"></div>
+          <style>
+            .memory-card {
+              width: 80px; height: 100px;
+              cursor: pointer;
+              position: relative;
+              transform-style: preserve-3d;
+              transition: transform 0.6s;
+            }
+            .memory-card.flipped { transform: rotateY(180deg); }
+            .memory-card.matched { opacity: 0.7; cursor: default; }
+            
+            .memory-card-inner {
+              position: relative; width: 100%; height: 100%;
+              text-align: center; transition: transform 0.6s;
+              transform-style: preserve-3d;
+            }
+            
+            .memory-card-front, .memory-card-back {
+              position: absolute; width: 100%; height: 100%;
+              backface-visibility: hidden; border-radius: 10px;
+              display: flex; align-items: center; justify-content: center;
+              font-size: 2.5rem; box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            }
+            
+            .memory-card-front { background: #ffb3ff; color: white; }
+            .memory-card-back { background: white; transform: rotateY(180deg); }
+          </style>
+          <button onclick="initMemoryGame()" style="margin-top: 20px; background: #ffb3ff; color: white; padding: 10px 20px; border-radius: 20px;">Reiniciar Memoria</button>
+        </div>
+
+        <div id="container-checkers" class="game-container" style="display:none;">
+          <button onclick="backToGamesMenu()" style="background: #ccc; margin-bottom: 10px;">⬅ Volver al menú</button>
+          <h3>Damas Unicornio 🏁🦄</h3>
+          <div id="checkers-board" style="display: grid; grid-template-columns: repeat(8, 60px); grid-template-rows: repeat(8, 60px); border: 5px solid #333; justify-content: center; margin: 0 auto;"></div>
+          <style>
+            .checkers-square { width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; }
+            .checkers-piece { width: 45px; height: 45px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; }
+            /* Colores de las piezas se controlarán por CSS variables inyectadas por el tema */
+            :root { --checkers-dark: #795548; --checkers-light: #ffccbc; --piece-user: #e91e63; --piece-cpu: #2196f3; }
+          </style>
+          <div id="checkers-status" class="status-bar"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Script imports in mandatory order (Section 7) -->
+  <script src="js/audio.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/games/tic_tac_toe.js"></script>
+  <script src="js/games/unicorn_mario.js"></script>
+  <script src="js/games/memory.js"></script>
+  <script src="js/games/checkers.js"></script>
+</body>
+</html>
